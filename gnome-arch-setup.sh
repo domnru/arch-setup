@@ -105,12 +105,11 @@ run_script() {
 }
 
 # Benutzerabfrage
-print_red "Do you really want to continue? (yes/no): "
+print_red "Do you really want to continue? (y/N): "
 read response
 
 # Überprüfen der Benutzerantwort
-if [ "$response" == "yes" ]; then
-    echo "Continuing..."
+if [ "$response" == "y" ]; then
     run_script
 else
     echo "Aborted."
