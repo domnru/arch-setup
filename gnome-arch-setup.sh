@@ -80,9 +80,18 @@ configure_git() {
     git config --global user.email "$email"
 }
 
+install_office() {
+    paru -Sy onlyoffice-bin
+}
+
+debloat() {
+    sudo pacman -Rcns gnome-maps gnome-music gnome-weather gnome-remote-desktop 
+}
+
 run_script() {
     update_and_install_packages
     setup_aur_helper
+    debloat
     generate_ssh_key
     setup_rust
     enable_bluetooth
