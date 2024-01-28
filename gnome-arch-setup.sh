@@ -7,7 +7,7 @@ print_red() {
 
 update_and_install_packages() {
     echo "Updating and installing additional packages"
-    sudo pacman -Syu git mtpfs ntfs-3g deja-dup power-profiles-daemon bluez bluez-utils gnome-firmware rustup npm
+    sudo pacman -Syu git mtpfs ntfs-3g deja-dup power-profiles-daemon bluez bluez-utils gnome-firmware rustup npm cantarell-fonts
 }
 
 setup_aur_helper() {
@@ -88,6 +88,20 @@ debloat() {
     sudo pacman -Rcns gnome-maps gnome-music gnome-weather gnome-remote-desktop 
 }
 
+bootsplash() {
+    paru -S plymouth
+    sudo sed -i 's/udev/udev plymouth/g' /etc/mkinitcpio.conf
+    sudo mkinitcpio -p linux-hardened
+    sudo sed -i 's/rw/rw quiet splash/g' /boot/loader/entries/*linux-hardened.conf
+    sudo systemctl disable gdm
+    sudo systemctl enable gdm
+    git clone https://github.com/murkl/plymouth-theme-arch-os.git 
+    cd plymouth-theme-arch-os
+    sudo cp -r ./src /usr/share/plymouth/themes/arch-os
+    sudo plymouth-set-default-theme -R arch-os
+    cd .. && rm -r plymouth-theme-arch-os
+}
+
 run_script() {
     update_and_install_packages
     setup_aur_helper
@@ -102,8 +116,11 @@ run_script() {
     enable_unprivileged_userns_clone
     other_stuff
     configure_git
+    install_office
+    bootsplash
 }
 
+echo  "This script will reboot your device at the end"
 # Benutzerabfrage
 print_red "Do you really want to continue? (y/N): "
 read response
@@ -111,6 +128,7 @@ read response
 # Überprüfen der Benutzerantwort
 if [ "$response" == "y" ]; then
     run_script
+    reboot
 else
     echo "Aborted."
 fi
