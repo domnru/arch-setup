@@ -37,7 +37,7 @@ enable_bluetooth() {
 
 install_browser_and_packages() {
     echo "Installing browser and additional packages"
-    paru -Syu visual-studio-code-bin ungoogled-chromium-bin discord_arch_electron
+    paru -Syu visual-studio-code-bin ungoogled-chromium-bin discord_arch_electron plymouth
 }
 
 setup_npm() {
@@ -63,6 +63,7 @@ change_vscode_settings() {
         "editor.cursorSmoothCaretAnimation": "on"
     }' > ~/.config/Code/User/settings.json
     xdg-mime default org.gnome.Nautilus.desktop inode/directory
+    killall code
 }
 
 enable_unprivileged_userns_clone() {
@@ -90,7 +91,6 @@ debloat() {
 }
 
 bootsplash() {
-    paru -S plymouth
     sudo sed -i 's/udev/udev plymouth/g' /etc/mkinitcpio.conf
     sudo mkinitcpio -p linux-hardened
     sudo sed -i 's/rw/rw quiet splash/g' /boot/loader/entries/*linux-hardened.conf
@@ -101,25 +101,6 @@ bootsplash() {
     sudo cp -r ./src /usr/share/plymouth/themes/arch-os
     sudo plymouth-set-default-theme -R arch-os
     cd ..
-}
-
-run_script() {
-    update_and_install_packages
-    setup_rust
-    setup_aur_helper
-    debloat
-    generate_ssh_key
-    enable_bluetooth
-    install_browser_and_packages
-    setup_npm
-    setup_gnome_environment
-    change_vscode_settings
-    enable_unprivileged_userns_clone
-    other_stuff
-    configure_git
-    proton_drive_setup
-    proton_vpn
-    bootsplash
 }
 
 proton_drive_setup() {
@@ -148,8 +129,28 @@ proton_vpn() {
     fi
 }
 
-echo  "This script will reboot your device at the end"
+run_script() {
+    update_and_install_packages
+    setup_rust
+    setup_aur_helper
+    debloat
+    generate_ssh_key
+    enable_bluetooth
+    install_browser_and_packages
+    setup_npm
+    setup_gnome_environment
+    enable_unprivileged_userns_clone
+    change_vscode_settings
+    other_stuff
+    configure_git
+    proton_drive_setup
+    proton_vpn
+    bootsplash
+}
+
+print_red  "This script will reboot your device at the end. The first reboot will freeze. After showing 'Show Plymouth Reboot Screen' you have to unplug power"
 # Benutzerabfrage
+
 print_red "Do you really want to continue? (y/N): "
 read response
 
