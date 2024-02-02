@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 
 # Funktion zum Anzeigen von Text in roter Farbe
 print_red() {
@@ -7,7 +9,7 @@ print_red() {
 
 update_and_install_packages() {
     echo "Updating and installing additional packages"
-    sudo pacman -Syu git mtpfs ntfs-3g deja-dup power-profiles-daemon bluez bluez-utils gnome-firmware rustup npm cantarell-fonts
+    sudo pacman -Syu git mtpfs ntfs-3g deja-dup power-profiles-daemon bluez bluez-utils gnome-firmware rustup npm cantarell-fonts rclone libreoffice-fresh
 }
 
 setup_aur_helper() {
@@ -38,7 +40,7 @@ install_browser_and_packages() {
     paru -Syu visual-studio-code-bin ungoogled-chromium-bin discord_arch_electron
 }
 
-secure_npm() {
+setup_npm() {
     echo "Securing NPM"
     mkdir -p ~/.npm-global
     echo -e "export NPM_CONFIG_PREFIX=~/.npm-global\nexport PATH=\$PATH:~/.npm-global/bin" >> ~/.bashrc
@@ -52,12 +54,15 @@ setup_gnome_environment() {
 }
 
 change_vscode_settings() {
+    code
+    sleep 5s
     echo "Changing some VS-Code Settings"
     echo '{
         "window.dialogStyle": "custom",
         "window.titleBarStyle": "custom",
         "editor.cursorSmoothCaretAnimation": "on"
     }' > ~/.config/Code/User/settings.json
+    xdg-mime default org.gnome.Nautilus.desktop inode/directory
 }
 
 enable_unprivileged_userns_clone() {
@@ -80,10 +85,6 @@ configure_git() {
     git config --global user.email "$email"
 }
 
-install_office() {
-    paru -Sy onlyoffice-bin
-}
-
 debloat() {
     sudo pacman -Rcns gnome-maps gnome-music gnome-weather gnome-remote-desktop 
 }
@@ -99,25 +100,35 @@ bootsplash() {
     cd plymouth-theme-arch-os
     sudo cp -r ./src /usr/share/plymouth/themes/arch-os
     sudo plymouth-set-default-theme -R arch-os
-    cd .. && rm -r plymouth-theme-arch-os
+    cd ..
 }
 
 run_script() {
     update_and_install_packages
+    setup_rust
     setup_aur_helper
     debloat
     generate_ssh_key
-    setup_rust
     enable_bluetooth
     install_browser_and_packages
-    secure_npm
+    setup_npm
     setup_gnome_environment
     change_vscode_settings
     enable_unprivileged_userns_clone
     other_stuff
     configure_git
-    install_office
+    proton_drive_setup
     bootsplash
+}
+
+proton_drive_setup() {
+    print_red "To auto mount Proton Drive you have to name the remote 'Proton' not 'Proton Drive'"
+    print_red "Instructions: https://rclone.org/protondrive/"
+    print_red "New Remote -> !'Proton'! -> 'protondrive' -> your username -> your password -> your 2FA -> add Mailbox Password into 'advanced options' -> ENTER until 'Yes this is OK' -> Yes this is OK"
+    #rclone config
+    cp ./rclone-autostart ~/.config/systemd/user/rclone@Proton.service
+    mkdir ~/Proton
+    systemctl --user enable rclone@Proton
 }
 
 echo  "This script will reboot your device at the end"
