@@ -118,6 +118,7 @@ run_script() {
     other_stuff
     configure_git
     proton_drive_setup
+    proton_vpn
     bootsplash
 }
 
@@ -134,6 +135,16 @@ proton_drive_setup() {
         systemctl --user enable rclone@Proton
     else
         echo "Skipped Proton Drive"
+    fi
+}
+
+proton_vpn() {
+    print_red "Do you want to install Proton VPN? (y/N): "
+    read response
+    if [ "$response" == "y" ]; then
+        paru -S proton-vpn-gtk-app network-manager-applet
+    else
+        echo "Skipped Proton VPN"
     fi
 }
 
