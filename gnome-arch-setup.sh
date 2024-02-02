@@ -125,7 +125,7 @@ proton_drive_setup() {
     print_red "To auto mount Proton Drive you have to name the remote 'Proton' not 'Proton Drive'"
     print_red "Instructions: https://rclone.org/protondrive/"
     print_red "New Remote -> !'Proton'! -> 'protondrive' -> your username -> your password -> your 2FA -> add Mailbox Password into 'advanced options' -> ENTER until 'Yes this is OK' -> Yes this is OK"
-    #rclone config
+    rclone config
     cp ./rclone-autostart ~/.config/systemd/user/rclone@Proton.service
     mkdir ~/Proton
     systemctl --user enable rclone@Proton
