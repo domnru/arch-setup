@@ -14,7 +14,7 @@ update_and_install_packages() {
 
 setup_aur_helper() {
     echo "Setting up AUR helper"
-    git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si --noconfirm && cd .. && rm -r ./paru
+    git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si --noconfirm && cd .. && rm -rf ./paru
     sudo chmod o+w /etc/paru.conf
     echo -e "\n#Skip PGKBUILD Check \nSkipReview" >> /etc/paru.conf    
     sudo chmod o-w /etc/paru.conf
