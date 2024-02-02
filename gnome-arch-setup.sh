@@ -55,7 +55,7 @@ setup_gnome_environment() {
 
 change_vscode_settings() {
     code
-    sleep 5s
+    sleep 8s
     echo "Changing some VS-Code Settings"
     echo '{
         "window.dialogStyle": "custom",
